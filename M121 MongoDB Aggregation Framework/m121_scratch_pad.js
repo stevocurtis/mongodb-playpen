@@ -379,3 +379,69 @@ db.companies.aggregate([
     }
 ])
 
+//
+// $out
+//
+db.collection.aggregate([
+    { $stage1 },
+    { $stage2 },
+    ...
+    { $stageN },
+    { $out: "new_collection" }
+])
+
+//
+// $merge
+//
+db.collection.aggregate([
+    "$merge": {
+        "into": "target_collection",
+        "whenNotMatched": "insert" | "discard" | "fail",
+        "whenMatched": "merge" | "replace", "keepExisting"| "fail" | [...]
+    }
+])
+
+mflix_pipeline = [
+    {
+        "$project": {
+            "_id": "$username",
+            "mflix": "$$ROOT"
+        }
+    },
+    {
+        "$merge": {
+            "into": {
+                "db": "sv",
+                "collection": "users"
+            },
+            "whenNotMatched": "discaard"
+        }
+    }
+]
+
+//
+// Views
+//
+db.createView("bronze_banking", "customers", [
+    {
+        $match: { accountType: "bronze" }
+    },
+    {
+        $project: {
+            _id: 0,
+            name: {
+                $concat: [
+                    { $cond: [{ $eq: ["$gender", "female"] }, "Miss", "Mr"] },
+                    " ",
+                    "$name.first",
+                    " ",
+                    "$name.last"
+                ]
+            },
+            phone: 1,
+            email: 1,
+            address: 1,
+            accound_ending: { $substr: ["$accountNamber", 7, -1] }
+        }
+    }
+])
