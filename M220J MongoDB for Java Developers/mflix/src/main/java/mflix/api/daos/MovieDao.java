@@ -123,6 +123,12 @@ public class MovieDao extends AbstractMFlixDao {
         //TODO> Ticket: Projection - implement the query and projection required by the unit test
         List<Document> movies = new ArrayList<>();
 
+        Document filter = new Document("cast", new Document("$all", country));
+                moviesCollection
+                        .find(filter)
+                        .projection(new Document("title", 1))
+                        .into(movies);
+
         return movies;
     }
 
