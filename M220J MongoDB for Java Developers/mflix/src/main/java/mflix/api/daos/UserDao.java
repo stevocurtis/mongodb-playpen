@@ -25,6 +25,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -150,6 +151,12 @@ public class UserDao extends AbstractMFlixDao {
         // be updated.
         //TODO > Ticket: Handling Errors - make this method more robust by
         // handling potential exceptions when updating an entry.
-        return false;
+        if (userPreferences == null)
+            throw new IncorrectDaoOperation("user preferences should not be empty");
+
+        Bson userQueryFilter = new Document("email", email);
+        usersCollection.updateMany(userQueryFilter, set("preferences", userPreferences));
+
+        return true;
     }
 }
